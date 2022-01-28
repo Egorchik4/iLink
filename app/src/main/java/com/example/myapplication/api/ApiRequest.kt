@@ -9,7 +9,7 @@ const val BASE_URLtwo = "https://random-d.uk/api/"
 interface CatRequest {
 
     @GET("rest")
-    suspend fun getRandomCat(): CatData
+    suspend fun getRandomCat(): CatData // возвращает тип CatData
 
 }
 
