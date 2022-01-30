@@ -46,13 +46,31 @@ class MenuFragment : Fragment() {
 
 
 
+
+        // наблюдатели
+        ViewMod.Live.observe(viewLifecycleOwner) {
+            // инициализация объекта
+            val buttonone = binding.buttoncat as TextView
+            val buttontwo = binding.buttonduck as TextView
+
+            var params = buttonone.layoutParams as ViewGroup.MarginLayoutParams
+            var paramstwo = buttontwo.layoutParams as ViewGroup.MarginLayoutParams
+
+
+            params.topMargin = ViewMod.Live.value!!
+            paramstwo.topMargin = ViewMod.Live.value!!
+        }
+
+
+
         binding.buttonduck.setOnClickListener {
-            ViewMod.animation(binding.buttoncat,binding.buttonduck)
+            ViewMod.animation(binding.buttoncat,binding.buttonduck,1100)
             ViewMod.showdug(binding.imageView)
+
 
         }
         binding.buttoncat.setOnClickListener {
-            ViewMod.animation(binding.buttoncat,binding.buttonduck)
+            ViewMod.animation(binding.buttoncat,binding.buttonduck,1100)
             ViewMod.showcat(binding.imageView)
         }
 

@@ -17,6 +17,6 @@ interface CatRequest {
 interface DuckRequest {
 
     @GET("random")
-    suspend fun getRandomDuck(): DuckData
+    suspend fun getRandomDuck(): DuckData  // suspend для возможности вызывать из corutins
 
 }

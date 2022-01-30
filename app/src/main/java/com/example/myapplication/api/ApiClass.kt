@@ -29,7 +29,7 @@ class ApiClass {
                     val responsecat = api.getRandomCat()
 
                     withContext(Dispatchers.Main) {
-                        Glide.with(view.context).load(responsecat.url).into(view as ImageView) //???
+                        Glide.with(view.context).load(responsecat.url).into(view as ImageView) //
                         view.visibility = View.VISIBLE   // показ картинки
 
 
