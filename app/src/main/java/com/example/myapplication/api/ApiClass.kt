@@ -29,9 +29,13 @@ class ApiClass {
                     val responsecat = api.getRandomCat()
 
                     withContext(Dispatchers.Main) {
-                        Glide.with(view.context).load(responsecat.url).into(view as ImageView) //
-                        view.visibility = View.VISIBLE   // показ картинки
 
+                        Glide.with(view.context)
+                            .load(responsecat.url)
+                            .centerCrop()
+                            .into(view as ImageView) //
+
+                        view.visibility = View.VISIBLE   // показ картинки
 
                     }
                 } catch (e: Exception) {
@@ -50,9 +54,13 @@ class ApiClass {
                     val responsecat = api.getRandomDuck()
 
                     withContext(Dispatchers.Main) {
-                        Glide.with(view.context).load(responsecat.url).into(view as ImageView) //???
-                        view.visibility = View.VISIBLE   // показ картинки
 
+                        Glide.with(view.context)
+                            .load(responsecat.url)
+                            .centerCrop()
+                            .into(view as ImageView) //???
+
+                        view.visibility = View.VISIBLE   // показ картинки
 
                     }
                 } catch (e: Exception) {

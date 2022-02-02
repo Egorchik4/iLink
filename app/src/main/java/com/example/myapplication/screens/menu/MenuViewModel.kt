@@ -1,4 +1,4 @@
-package com.example.myapplication.screens
+package com.example.myapplication.screens.menu
 
 import android.content.Context
 import android.util.Log
@@ -32,8 +32,8 @@ class MenuViewModel : ViewModel() {
     val Live: LiveData<Int> = MutLive
 
 
-    private var MutLiveInternet = MutableLiveData<String>()
-    val LiveInter: LiveData<String> = MutLiveInternet
+    //private var MutLiveInternet = MutableLiveData<String>()
+    //val LiveInter: LiveData<String> = MutLiveInternet
 
 
 
