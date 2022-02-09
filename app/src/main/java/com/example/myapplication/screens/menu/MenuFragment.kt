@@ -8,17 +8,26 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.activityViewModels
 import com.example.myapplication.R
 import com.example.myapplication.databinding.MenuFragmentBinding
 import com.example.myapplication.screens.photos.PhotoFragment
+import com.example.myapplication.screens.photos.PhotoViewModel
+import java.io.FileOutputStream
+import java.io.OutputStream
+import com.example.myapplication.data.FileSave
+import java.io.File
 
 class MenuFragment : Fragment() {
 
+
     lateinit var binding: MenuFragmentBinding  // название разметки layout + 'binding'
-    private val ViewMod: MenuViewModel by activityViewModels()  // класс ViewModel
+    private val VMMenu: MenuViewModel by activityViewModels()  // класс ViewModel
+    private val VMPhoto: PhotoViewModel by activityViewModels()
 
     private var i : Int = 0
+    private var n: Int = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = MenuFragmentBinding.inflate(inflater)
@@ -37,48 +46,49 @@ class MenuFragment : Fragment() {
         binding.bSpisok.text = "List"
 
 
-
         // наблюдатели
-        ViewMod.Live.observe(viewLifecycleOwner) {
+        VMMenu.Live.observe(viewLifecycleOwner) {
             // инициализация объекта
             val buttonone = binding.buttoncat as TextView
             val buttontwo = binding.buttonduck as TextView
-
             var params = buttonone.layoutParams as ViewGroup.MarginLayoutParams
             var paramstwo = buttontwo.layoutParams as ViewGroup.MarginLayoutParams
 
-
             // взятие значений из livedata
-            params.topMargin = ViewMod.Live.value!!
-            paramstwo.topMargin = ViewMod.Live.value!!
+            params.topMargin = VMMenu.Live.value!!
+            paramstwo.topMargin = VMMenu.Live.value!!
         }
 
 
+        VMPhoto.LiveInt.observe(viewLifecycleOwner){
+            n = VMPhoto.LiveInt.value!!  // работает елси не null
+        }
 
         binding.buttonduck.setOnClickListener {
-            ViewMod.animation(binding.buttoncat,binding.buttonduck,1100)
-            ViewMod.showdug(binding.imageView)
+            VMMenu.animation(binding.buttoncat,binding.buttonduck,1100)
+            VMMenu.showdug(binding.imageView)
             binding.buttonlike.visibility = View.VISIBLE // показ кнопки Like
-
 
         }
         binding.buttoncat.setOnClickListener {
-            ViewMod.animation(binding.buttoncat,binding.buttonduck,1100)
-            ViewMod.showcat(binding.imageView)
+            VMMenu.animation(binding.buttoncat,binding.buttonduck,1100)
+            VMMenu.showcat(binding.imageView)
             binding.buttonlike.visibility = View.VISIBLE
         }
 
 
         binding.buttonlike.setOnClickListener {
-            val text : String = "Like and Save"
+            val text: String = "Like and Save"
             val duration = Toast.LENGTH_SHORT
-
             val toast = Toast.makeText(binding.buttonlike.context, text, duration)
             toast.show()
 
+            // загрузка изображения
+            var path: String = VMMenu.saveFile(binding.imageView,n)   // получаем путь к файлу
+            VMPhoto.savepath(path) // отправляем путь на сохранение
+            //VMPhoto.saveInt(n++)
+
         }
-
-
 
         binding.imageView.setOnClickListener {
             i++
@@ -104,6 +114,6 @@ class MenuFragment : Fragment() {
                     ?.replace(R.id.fragment_container,PhotoFragment())
                     ?.commit()
             }
-        }
+    }
 
 }

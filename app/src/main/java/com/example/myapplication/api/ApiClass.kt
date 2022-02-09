@@ -4,6 +4,7 @@ import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -32,6 +33,7 @@ class ApiClass {
 
                         Glide.with(view.context)
                             .load(responsecat.url)
+                            .diskCacheStrategy(DiskCacheStrategy.NONE)  // не кэшировать изобраения
                             .centerCrop()
                             .into(view as ImageView) //
 
@@ -57,6 +59,7 @@ class ApiClass {
 
                         Glide.with(view.context)
                             .load(responsecat.url)
+                            .diskCacheStrategy(DiskCacheStrategy.NONE)  // не кэшировать изобраения
                             .centerCrop()
                             .into(view as ImageView) //???
 
