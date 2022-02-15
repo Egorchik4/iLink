@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.myapplication.data.FileSave
 import java.io.File
 import java.io.FileReader
 
@@ -16,22 +17,42 @@ class PhotoViewModel : ViewModel() {
     private var MutLiveInt = MutableLiveData<Int>()
     val LiveInt: LiveData<Int> = MutLiveInt
 
-    var productSet: MutableList<String>? = mutableListOf()  // список адресов
+    private var RecyclLive = MutableLiveData<Int?>()
+    val RecLive: LiveData<Int?> = RecyclLive
+
+    private var delateLive = MutableLiveData<Int?>()
+    val DelateLive: LiveData<Int?> = delateLive
+
+    // список адресов
+    var productSet: MutableList<String>? = mutableListOf()
     val path: String = "/data/user/0/com.example.myapplication/cache/photo"
 
+
+    var fileclass = FileSave()
+
     init{
-        readFile(path)  // ссылка на папку
+        // считывание адресов фото(которые уже есть в памяти телефона) и заполненение списка адресов (выполняется только при запуске приложения)
+        fileclass.readFile(path,productSet) // ссылка на папку
+
+        // инициализации LiveDatas
+        saveInt(productSet?.size ?: 0, 0)
+        saveInt(0, 1)
+        refreshdata()
         Log.e("eee","init")
     }
 
-    fun saveInt(r: Int){
-        MutLiveInt.value = r
+    fun saveInt(r: Int, key: Int){
+        if (key == 0){
+            MutLiveInt.value = r
+        }else{
+            RecyclLive.value = r
+        }
     }
 
     private fun refreshdata(){
         SaveLive.value = productSet
-        saveInt(productSet!!.size)
-        Log.e("eee",SaveLive.value?.size.toString()+" is Directory")
+        saveInt(productSet?.size ?: 0, 0)  //элвис оператор (если левая часть null, то выполняй правую)
+        //Log.e("eee",SaveLive.value?.size.toString()+" is Directory")
     }
 
     fun savepath(d: String){
@@ -39,37 +60,38 @@ class PhotoViewModel : ViewModel() {
         refreshdata()
     }
 
-    fun delateAL(){
-        productSet?.clear()
-        refreshdata()
 
-        val t = File(path)
-        //Log.e("eee",t.isDirectory.toString()+" Directory")
+    fun delateById(positionList: MutableList<String>){
+        Log.e("eee",positionList.size.toString()+" positionList")
 
-        if (t.isDirectory){
-            //очистка папки(Directory)
-            for(i in 0..(t.listFiles().size-1)){
-                t.listFiles().get(0).delete()
-            }
-            // удаление самой папки
-            t.delete()
-        } else if (t.isFile){
-            t.delete()
-        }
-    }
+        // ???
+        if (positionList.size != 0 && productSet?.size != null){
 
-    // считывание адресов фото(которые уже есть в памяти телефона) и заполненение (выполняется только при запуске приложения)
-    fun readFile(path: String){
-        val r = File(path)
-        saveInt(r.listFiles().size)
-        // проверка на существование папки на пути(path)
-        if(r.isDirectory){
-            for(i in 0..(r.listFiles().size-1)){
-                productSet?.add(r.listFiles().get(i).toString())  // заполнение нашего списка адресами файлов
+            for(i in 0..(positionList.size-1)){
+                //Log.e("eee", i.toString()+" iteration:")
+                //Log.e("eee", productSet?.size.toString()+" !!")
+
+                productSet?.removeIf {
+                    it.contains(positionList[i])
+                }
+
+                fileclass.delateAL(positionList[i])
+                //Log.e("eee", productSet?.size.toString()+" !!!")
             }
             refreshdata()
         }
+
+
     }
+
+    fun delateAL(){
+        productSet?.clear()
+        refreshdata()
+        fileclass.delateAL(path)
+    }
+
+
+
 
 
 

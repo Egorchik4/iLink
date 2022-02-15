@@ -67,7 +67,11 @@ class MenuFragment : Fragment() {
         binding.buttonduck.setOnClickListener {
             VMMenu.animation(binding.buttoncat,binding.buttonduck,1100)
             VMMenu.showdug(binding.imageView)
-            binding.buttonlike.visibility = View.VISIBLE // показ кнопки Like
+            binding.frameLayout.visibility = View.VISIBLE
+            if (binding.frameLayout.visibility.equals(View.VISIBLE)){
+                binding.buttonlike.visibility = View.VISIBLE // показ кнопки Like
+            }
+
 
         }
         binding.buttoncat.setOnClickListener {
@@ -86,8 +90,6 @@ class MenuFragment : Fragment() {
             // загрузка изображения
             var path: String = VMMenu.saveFile(binding.imageView,n)   // получаем путь к файлу
             VMPhoto.savepath(path) // отправляем путь на сохранение
-            //VMPhoto.saveInt(n++)
-
         }
 
         binding.imageView.setOnClickListener {
@@ -101,6 +103,10 @@ class MenuFragment : Fragment() {
 
                     val toast = Toast.makeText(binding.buttonlike.context, text, duration)
                     toast.show()
+
+                    // загрузка изображения
+                    var path: String = VMMenu.saveFile(binding.imageView,n)   // получаем путь к файлу
+                    VMPhoto.savepath(path) // отправляем путь на сохранение
 
                 }
                 i = 0
