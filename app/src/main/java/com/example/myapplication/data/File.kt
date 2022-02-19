@@ -38,17 +38,14 @@ class FileSave {
 
     fun delateAL(path: String){
         val t = File(path)
-        //Log.e("eee",t.isDirectory.toString()+" Directory")
-
         if (t.isDirectory){
             //очистка папки(Directory)
             for(i in 0..(t.listFiles().size-1)){
                 t.listFiles().get(0).delete()
             }
-            // удаление самой папки
-            t.delete()
+            t.delete() // удаление самой папки
         } else if (t.isFile){
-            t.delete()
+            t.delete() // удаление самого файла
         }
     }
 

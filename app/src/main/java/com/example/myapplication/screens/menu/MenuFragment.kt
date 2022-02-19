@@ -1,13 +1,16 @@
 package com.example.myapplication.screens.menu
 
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.activityViewModels
 import com.example.myapplication.R
@@ -42,10 +45,6 @@ class MenuFragment : Fragment() {
         binding.buttoncat.text = "CAT"
         binding.buttonduck.text = "DUCK"
 
-        binding.buttonlike.text = "Like"
-        binding.bSpisok.text = "List"
-
-
         // наблюдатели
         VMMenu.Live.observe(viewLifecycleOwner) {
             // инициализация объекта
@@ -61,56 +60,52 @@ class MenuFragment : Fragment() {
 
 
         VMPhoto.LiveInt.observe(viewLifecycleOwner){
-            n = VMPhoto.LiveInt.value!!  // работает елси не null
+            n = VMPhoto.LiveInt.value!!
         }
+
+
 
         binding.buttonduck.setOnClickListener {
             VMMenu.animation(binding.buttoncat,binding.buttonduck,1100)
             VMMenu.showdug(binding.imageView)
-            binding.frameLayout.visibility = View.VISIBLE
-            if (binding.frameLayout.visibility.equals(View.VISIBLE)){
-                binding.buttonlike.visibility = View.VISIBLE // показ кнопки Like
-            }
+            binding.buttonlike.visibility = View.VISIBLE // показ кнопки Like
+            binding.buttonlike.setBackgroundColor(ContextCompat.getColor(binding.buttonlike.context,R.color.black))
+
+
 
 
         }
         binding.buttoncat.setOnClickListener {
             VMMenu.animation(binding.buttoncat,binding.buttonduck,1100)
             VMMenu.showcat(binding.imageView)
-            binding.buttonlike.visibility = View.VISIBLE
+            binding.buttonlike.visibility = View.VISIBLE // показ кнопки Like
+            binding.buttonlike.setBackgroundColor(ContextCompat.getColor(binding.buttonlike.context,R.color.black))
         }
 
 
         binding.buttonlike.setOnClickListener {
-            val text: String = "Like and Save"
-            val duration = Toast.LENGTH_SHORT
-            val toast = Toast.makeText(binding.buttonlike.context, text, duration)
-            toast.show()
-
             // загрузка изображения
-            var path: String = VMMenu.saveFile(binding.imageView,n)   // получаем путь к файлу
-            VMPhoto.savepath(path) // отправляем путь на сохранение
+            var path: String? = VMMenu.saveFile(binding.imageView,n)   // получаем путь к файлу
+            if (path != null){
+                VMPhoto.AddPath(path) // отправляем путь на сохранение
+                binding.buttonlike.setBackgroundColor(ContextCompat.getColor(binding.buttonlike.context,R.color.green))
+            }
+
         }
 
         binding.imageView.setOnClickListener {
             i++
             val handler = Handler()
-
             handler.postDelayed({
                 if(i == 2){
-                    val text = "Like and Save"
-                    val duration = Toast.LENGTH_SHORT
-
-                    val toast = Toast.makeText(binding.buttonlike.context, text, duration)
-                    toast.show()
-
-                    // загрузка изображения
-                    var path: String = VMMenu.saveFile(binding.imageView,n)   // получаем путь к файлу
-                    VMPhoto.savepath(path) // отправляем путь на сохранение
-
+                    var path: String? = VMMenu.saveFile(binding.imageView,n)   // получаем путь к файлу
+                    if (path != null){
+                        VMPhoto.AddPath(path) // отправляем путь на сохранение
+                        binding.buttonlike.setBackgroundColor(ContextCompat.getColor(binding.buttonlike.context,R.color.green))
+                    }
                 }
                 i = 0
-            },400)
+            },1000)
 
         }
 

@@ -10,48 +10,49 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.myapplication.R
 import com.example.myapplication.databinding.PhotoItemBinding
-
-//interface UserActionListener{
-    //fun onUserDelete(user: MutableList<String>)
-
-   // fun onUserDetails(user: MutableList<String>)
-//}
-
+import kotlinx.coroutines.delay
 
 class RecyclerAdapter() : RecyclerView.Adapter<RecyclerAdapter.PhotoHolder>() {
 
     var photoList: MutableList<String>? = mutableListOf() // лист ячеек списка тип String (отложенная инициализация)
-    var delateList: MutableList<String>? = mutableListOf() // спискок хранения позиций на удаление
+    var delateList: MutableList<String> = mutableListOf() // спискок хранения позиций на удаление
     var visibleCheck: Int = 0
 
+    // добавление элемента в начало списка
+    fun addItem(newItem: String, index: Int){
+        //Log.e("eee", newItem+" $index")
+        photoList?.add(newItem)
+        //Log.e("eee", photoList?.size.toString()+" photoList.size")
+        notifyItemChanged(index)
+    }
 
-    // ???
+    // удаление элементов
+    fun deleteItem(index: Int){
+        //val position = newItem.indexOf(newItem)
+        Log.e("eee", index.toString()+"deleteItem")
+        photoList?.removeAt(index)
+        notifyItemChanged(index)
+    }
+
+    // вставка на нужную позицию
+    fun updateItem(position: Int,newItem: String){
+        //photoList[position] = newItem
+        notifyItemChanged(position)
+    }
+
+
     class PhotoHolder(item: View) : RecyclerView.ViewHolder(item) {  // принимаем раздутую View(ячейку списка) из onCreateViewHolder
         val bindingg = PhotoItemBinding.bind(item) // viewBinding
-        fun bind(photostr: String,t: Int, position: Int)  // заполнение View
+
+        fun bind(photostr: String)  // заполнение View
         {
             Glide.with(itemView)
                 .load(photostr)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)  // не кэшировать изобраения
                 .into(bindingg.imageView2)  // photostr - путь в кэше, где находиться картинка
-
-            bindingg.checkBox.visibility = View.GONE
         }
 
-
-        // Обработка нажатия на элемент в списке
-        //init {
-         //   bindingg.imageView2.setOnClickListener {
-         //       val text: String = "$position"
-         //       val duration = Toast.LENGTH_SHORT
-         //       val toast = Toast.makeText(bindingg.imageView2.context, text, duration)
-          //      toast.show()
-          //  }
-
-        //}
-
     }
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerAdapter.PhotoHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.photo_item, parent, false) // надуваем View(ячейку списка)
@@ -60,79 +61,110 @@ class RecyclerAdapter() : RecyclerView.Adapter<RecyclerAdapter.PhotoHolder>() {
 
     // все действия со списком происходят здесь(не обязательно)
     override fun onBindViewHolder(holder: RecyclerAdapter.PhotoHolder, position: Int) {
-        holder.bind(photoList!![position],visibleCheck,position)  // отправляем данные текущей позиции
-        //holder.bindingg.checkBox.visibility = View.VISIBLE  // РАБОТАЕТ!!!
-        Log.e("eee", visibleCheck.toString() + " C")
-        holder.bindingg.checkBox.visibility = View.GONE
+        holder.bind(photoList!![position])  // отправляем данные текущей позиции
 
-        if (visibleCheck != 0){
+        // видимость объектов
+        if(visibleCheck != 0){
+            holder.bindingg.checkBox.visibility = View.VISIBLE
             holder.bindingg.imageView2.setOnClickListener {
                 val text: String = "$position"
                 val duration = Toast.LENGTH_SHORT
                 val toast = Toast.makeText(holder.bindingg.imageView2.context, text, duration)
                 toast.show()
-
-
-                dalateById(photoList!![position])
-                holder.bindingg.checkBox.visibility = View.VISIBLE
                 holder.bindingg.checkBox.setChecked(true)
+
+                // !!!
+                dalateById(photoList!![position])
+
+                holder.bindingg.checkBox.setOnClickListener {
+                    if(holder.bindingg.checkBox.isChecked){
+                        Log.e("eee", " $position check")
+                    }else{
+                        // !!!
+                        delateBy(photoList!![position])
+
+                    }
+                }
+
             }
         }else{
-            //holder.bindingg.checkBox.visibility = View.GONE
+            holder.bindingg.imageView2.setOnClickListener(null) // удаления слушателя нажатий
+            holder.bindingg.checkBox.visibility = View.GONE
+            holder.bindingg.checkBox.setChecked(false)
         }
-
-        //if (holder.bindingg.checkBox.isChecked){
-
-
-            //dalateById(position)
-        //}
-
-        //holder.bindingg.imageView2.setOnClickListener {
-       //     onClick.onClicked(photoList!![position])
-        //}
-
     }
 
     override fun getItemCount(): Int {
         return photoList!!.size
     }
 
-
     // обновление списка
     fun addAll(lst: MutableList<String>?) {
-        photoList = lst
-        //Log.e("eee", photoList?.size.toString() + " addALL")
+        if(photoList != null) {
+            //Log.e("eee", " not null")
+            // добавление элементов
+            if (photoList!!.size < lst!!.size) {
+                //Log.e("eee", " lst")
+                var n: Int = lst!!.size - photoList!!.size
+                //Log.e("eee", " $n")
+                //Log.e("eee", (lst!!.size-1).toString())
+                if(n == lst!!.size){
+                    n = 0
+                }
+                for (i in n..(lst!!.size - 1)) {
+                    //Log.e("eee", i.toString()+" FOR")
+                    addItem(lst.get(i), i)
+                }
 
-        if (photoList != null) {
-            notifyDataSetChanged()  // обновление списка для отображения
+            }
         }
+
     }
 
+    // Удаление элементов списка
+    fun deleteALL(lst: MutableList<String>?){
+        // удаление элементов
+        if(photoList != null) {
+            for(i in 0..(lst!!.size-1)){
+                Log.e("eee", i.toString())
+                deleteItem(photoList!!.indexOf(lst!!.get(i)))
+
+            }
+        }
+
+    }
 
     // для изменения вида списка
     fun check(e: Int){
         visibleCheck = e
-        //Log.e("eee", visibleCheck.toString() + " check")
         notifyDataSetChanged()
     }
 
 
-
-
-    private fun dalateById(t: String){
-        delateList?.add(t)
-        Log.e("eee", delateList?.size.toString() + " LLLL")
+    fun dalateById(t: String){
+        //Log.e("eee", t)
+        delateList.add(t)
+        Log.e("eee", delateList.size.toString()+" deleteSize")
     }
 
-    fun cleardealeteList(){
-        Log.e("eee", delateList?.size.toString() + " delateLLLL")
-        delateList?.clear()
+    fun delateBy(d: String){
+        for(i in 0..(delateList.size-1)){
+            delateList.removeIf {
+                it.contains(d)
+            }
+        }
+        Log.e("eee", delateList.size.toString()+" deleteSize")
 
     }
 
     fun getDeleteList(): MutableList<String>? {
         return delateList
     }
+
+    fun cleardealeteList(){
+        delateList.clear()
+    }
+
 
 
 }

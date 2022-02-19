@@ -76,33 +76,37 @@ class MenuViewModel : ViewModel() {
         }
     }
 
-    fun saveFile(photo: ImageView,n: Int): String{
+    fun saveFile(photo: ImageView,n: Int): String?{
+        var pathtofile: String?
 
-        var pathtofile: String = ""
-        //var n = VMP.LiveInt.value!!
-        Log.e("eee",n.toString()+" VMP.LiveInt.value")
-        // создание папки для хранение фото
-        val file = File(fi.createpackage(photo),"test$n.jpg")  // объект класса File
-        // сохранение фото
-        var iv: ImageView = photo  // ImageView, содержащий изображение, которое нужно сохранить
         try{
-            val stream: OutputStream = FileOutputStream(file)
+            // сохранение фото
+            var iv: ImageView = photo  // ImageView, содержащий изображение, которое нужно сохранить
+            Log.e("eee", " 1")
             val draw = iv.drawable
+            Log.e("eee", " 2")
             val bitmap = (draw as BitmapDrawable).bitmap  // взятие bitmap картинки, котрая содержится в ImageView
+            Log.e("eee", " 3")
+
+
+            // создание папки для хранение фото
+            val file = File(fi.createpackage(photo),"test$n.jpg")  // объект класса File
+            Log.e("eee", " 4")
+            val stream: OutputStream = FileOutputStream(file)
+            Log.e("eee", " 5")
+
             bitmap.compress(Bitmap.CompressFormat.JPEG,100,stream)  // сжатие файла 100 - не сжимаем
             stream.flush()
             stream.close()
 
-            // ??? как правильно вызывать эту функцию ???
-            //VMP.savepath(Uri.parse(file.absolutePath).toString())  // сохраняем путь к файлу
             pathtofile = Uri.parse(file.absolutePath).toString()
-            //n++
-            //VMP.saveInt(n)  // сохраняем значение в LiveData
 
+            Toast.makeText(photo.context,"Like and Save", Toast.LENGTH_SHORT).show()
             Toast.makeText(photo.context,"Image save${Uri.parse(file.absolutePath)}", Toast.LENGTH_SHORT).show()
 
         }catch (e: Exception){
-            Log.e("eee",e.message.toString())
+            Toast.makeText(photo.context,"Error", Toast.LENGTH_SHORT).show()
+            pathtofile = null
         }
         return pathtofile
 

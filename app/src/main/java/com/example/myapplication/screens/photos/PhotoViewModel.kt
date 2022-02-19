@@ -11,8 +11,15 @@ import java.io.FileReader
 
 class PhotoViewModel : ViewModel() {
 
-    private var SaveLive = MutableLiveData<MutableList<String>?>()
-    val SLive: LiveData<MutableList<String>?> = SaveLive
+    // Добавление элементов
+    private var AddLive = MutableLiveData<MutableList<String>?>()
+    val addLive: LiveData<MutableList<String>?> = AddLive
+
+    // Удаление элементов
+    private var DeleteLive = MutableLiveData<MutableList<String>?>()
+    val deleteLive: LiveData<MutableList<String>?> = DeleteLive
+
+
 
     private var MutLiveInt = MutableLiveData<Int>()
     val LiveInt: LiveData<Int> = MutLiveInt
@@ -20,26 +27,29 @@ class PhotoViewModel : ViewModel() {
     private var RecyclLive = MutableLiveData<Int?>()
     val RecLive: LiveData<Int?> = RecyclLive
 
-    private var delateLive = MutableLiveData<Int?>()
-    val DelateLive: LiveData<Int?> = delateLive
-
     // список адресов
     var productSet: MutableList<String>? = mutableListOf()
-    val path: String = "/data/user/0/com.example.myapplication/cache/photo"
-
+    val path: String = "/data/user/0/com.example.myapplication/cache/photo" // место сохранения файлов
 
     var fileclass = FileSave()
 
     init{
         // считывание адресов фото(которые уже есть в памяти телефона) и заполненение списка адресов (выполняется только при запуске приложения)
         fileclass.readFile(path,productSet) // ссылка на папку
-
         // инициализации LiveDatas
+        AddLive.value = productSet
         saveInt(productSet?.size ?: 0, 0)
         saveInt(0, 1)
-        refreshdata()
         Log.e("eee","init")
     }
+
+    // заполнение списка
+    fun AddPath(path: String){
+        productSet?.add(path)  // заполнение списка
+        AddLive.value = productSet  // обновление AddLive
+        saveInt(productSet?.size ?: 0, 0)  //элвис оператор (если левая часть null, то выполняй правую)
+    }
+
 
     fun saveInt(r: Int, key: Int){
         if (key == 0){
@@ -49,49 +59,20 @@ class PhotoViewModel : ViewModel() {
         }
     }
 
-    private fun refreshdata(){
-        SaveLive.value = productSet
-        saveInt(productSet?.size ?: 0, 0)  //элвис оператор (если левая часть null, то выполняй правую)
-        //Log.e("eee",SaveLive.value?.size.toString()+" is Directory")
-    }
 
-    fun savepath(d: String){
-        productSet?.add(d)
-        refreshdata()
-    }
-
-
-    fun delateById(positionList: MutableList<String>){
-        Log.e("eee",positionList.size.toString()+" positionList")
-
-        // ???
+    fun DeleteList(positionList: MutableList<String>){
         if (positionList.size != 0 && productSet?.size != null){
-
             for(i in 0..(positionList.size-1)){
-                //Log.e("eee", i.toString()+" iteration:")
-                //Log.e("eee", productSet?.size.toString()+" !!")
-
                 productSet?.removeIf {
-                    it.contains(positionList[i])
+                    it.contains(positionList[i])  // удаление по значению(адресу)
                 }
-
                 fileclass.delateAL(positionList[i])
-                //Log.e("eee", productSet?.size.toString()+" !!!")
             }
-            refreshdata()
+            saveInt(productSet?.size ?: 0, 0)
+            DeleteLive.value = positionList // обновление DeleteLive
+
         }
-
-
     }
-
-    fun delateAL(){
-        productSet?.clear()
-        refreshdata()
-        fileclass.delateAL(path)
-    }
-
-
-
 
 
 
