@@ -19,13 +19,17 @@ class PhotoViewModel : ViewModel() {
     private var DeleteLive = MutableLiveData<MutableList<String>?>()
     val deleteLive: LiveData<MutableList<String>?> = DeleteLive
 
-
-
+    // нумерация сохраняемых файлов
     private var MutLiveInt = MutableLiveData<Int>()
     val LiveInt: LiveData<Int> = MutLiveInt
 
+    // состояние списка(отметка списка)
     private var RecyclLive = MutableLiveData<Int?>()
     val RecLive: LiveData<Int?> = RecyclLive
+
+    // selectAll
+    private var MutSelectLive = MutableLiveData<Int?>()
+    val SelectLive: LiveData<Int?> = MutSelectLive
 
     // список адресов
     var productSet: MutableList<String>? = mutableListOf()
@@ -40,6 +44,7 @@ class PhotoViewModel : ViewModel() {
         AddLive.value = productSet
         saveInt(productSet?.size ?: 0, 0)
         saveInt(0, 1)
+        selectInt(0)
         Log.e("eee","init")
     }
 
@@ -59,8 +64,14 @@ class PhotoViewModel : ViewModel() {
         }
     }
 
+    // selectAll
+    fun selectInt(t: Int){
+        MutSelectLive.value = t
+    }
 
+    // список на удаление
     fun DeleteList(positionList: MutableList<String>){
+        Log.e("eee",positionList.size.toString()+" size")
         if (positionList.size != 0 && productSet?.size != null){
             for(i in 0..(positionList.size-1)){
                 productSet?.removeIf {

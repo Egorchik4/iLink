@@ -71,7 +71,6 @@ class MenuViewModel : ViewModel() {
 
             val buttonaimtwo = AnimationUtils.loadAnimation(viewtwo.context, R.anim.buttonaim2)
             buttontwo.startAnimation(buttonaimtwo)
-
             MutLive.value = t  // LiveData
         }
     }

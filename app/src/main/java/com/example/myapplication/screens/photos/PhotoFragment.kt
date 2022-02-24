@@ -18,8 +18,6 @@ class PhotoFragment : Fragment() {
 
     lateinit var binding: PhotoFragmentBinding  // название разметки layout + 'binding'
     private val VMPhotone: PhotoViewModel by activityViewModels()
-    //private val VMMenuone: MenuViewModel by activityViewModels()  // класс ViewModel
-    //lateinit var data: MutableList<String>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = PhotoFragmentBinding.inflate(inflater)
@@ -43,26 +41,25 @@ class PhotoFragment : Fragment() {
 
         // для удаления элементов
         VMPhotone.deleteLive.observe(viewLifecycleOwner){
-            Log.e("eee", "deleteLive")
+            Log.e("eee", "deleteLive "+VMPhotone.deleteLive.value.toString())
             adapter.deleteALL(VMPhotone.deleteLive.value)
         }
-
-
-        // добавление элемента
-        //VMPhotone.addLive.observe(viewLifecycleOwner){
-         //   adapter.addItem(VMPhotone.addLive.value!!)
-        //}
-
-
-
+        
+        // появление галочек
         VMPhotone.RecLive.observe(viewLifecycleOwner){
             adapter.check(VMPhotone.RecLive.value ?: 0)
         }
 
+        // выделение всех элементов списка
+        VMPhotone.SelectLive.observe(viewLifecycleOwner){
+            adapter.activatecheck(VMPhotone.SelectLive.value ?: 0)
+        }
 
+        
         binding.bReturn.setOnClickListener {
             fragmentManager
                 ?.beginTransaction()
+                ?.setCustomAnimations(R.anim.enter_left_to_right,R.anim.exit_left_to_right)
                 ?.replace(R.id.fragment_container,MenuFragment())
                 ?.commit()
         }
@@ -70,27 +67,29 @@ class PhotoFragment : Fragment() {
         binding.bDelate.setOnClickListener {
             if (VMPhotone.RecLive.value == 0){
                 VMPhotone.saveInt(1,1) // активация галочек
-                binding.bDelate.setBackgroundColor(ContextCompat.getColor(binding.bDelate.context,R.color.red))
-                binding.bDelateALL.visibility = View.GONE
+                //binding.bDelate.setBackgroundColor(ContextCompat.getColor(binding.bDelate.context,R.color.red))
+                binding.bSelectALL.visibility = View.VISIBLE
                 binding.bReturn.visibility = View.GONE
+                VMPhotone.selectInt(0)
             }else{
                 VMPhotone.saveInt(0,1) // дезактивация
-                binding.bDelate.setBackgroundColor(ContextCompat.getColor(binding.bDelate.context,R.color.purple_500))
-                binding.bDelateALL.visibility = View.VISIBLE
+                //binding.bDelate.setBackgroundColor(ContextCompat.getColor(binding.bDelate.context,R.color.purple_500))
+                binding.bSelectALL.visibility = View.GONE
                 binding.bReturn.visibility = View.VISIBLE
 
                 // через LiveData
                 VMPhotone.DeleteList(adapter.getDeleteList()!!) // передаём список индексов которые нужно удалить
                 adapter.cleardealeteList() // очистка листа удаления
-
             }
-
         }
 
-        binding.bDelateALL.setOnClickListener {
-            // очитска памяти!!!
-            //VMPhotone.delateAL()
-            VMPhotone.saveInt(0,0)
+        binding.bSelectALL.setOnClickListener {
+            // выделение всех объектов
+            if (VMPhotone.SelectLive.value == 0){
+                VMPhotone.selectInt(1)  // выделение всех объектов в списке
+            }else{
+                VMPhotone.selectInt(0)  // снятие выделения
+            }
         }
     }
 }

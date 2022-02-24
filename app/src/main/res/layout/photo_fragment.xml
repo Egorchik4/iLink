@@ -38,9 +38,10 @@
         app:srcCompat="@drawable/ic_return" />
 
     <ImageView
-        android:id="@+id/bDelateALL"
+        android:id="@+id/bSelectALL"
         android:layout_width="30dp"
         android:layout_height="30dp"
+        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/rcView"
         app:layout_constraintEnd_toStartOf="@+id/bDelate"
         app:layout_constraintStart_toEndOf="@+id/bReturn"

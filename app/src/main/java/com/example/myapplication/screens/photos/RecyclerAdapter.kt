@@ -17,6 +17,7 @@ class RecyclerAdapter() : RecyclerView.Adapter<RecyclerAdapter.PhotoHolder>() {
     var photoList: MutableList<String>? = mutableListOf() // лист ячеек списка тип String (отложенная инициализация)
     var delateList: MutableList<String> = mutableListOf() // спискок хранения позиций на удаление
     var visibleCheck: Int = 0
+    var activateCheck: Int = 0
 
     // добавление элемента в начало списка
     fun addItem(newItem: String, index: Int){
@@ -35,10 +36,10 @@ class RecyclerAdapter() : RecyclerView.Adapter<RecyclerAdapter.PhotoHolder>() {
     }
 
     // вставка на нужную позицию
-    fun updateItem(position: Int,newItem: String){
+    ///fun updateItem(position: Int,newItem: String){
         //photoList[position] = newItem
-        notifyItemChanged(position)
-    }
+    //    notifyItemChanged(position)
+    //}
 
 
     class PhotoHolder(item: View) : RecyclerView.ViewHolder(item) {  // принимаем раздутую View(ячейку списка) из onCreateViewHolder
@@ -63,9 +64,30 @@ class RecyclerAdapter() : RecyclerView.Adapter<RecyclerAdapter.PhotoHolder>() {
     override fun onBindViewHolder(holder: RecyclerAdapter.PhotoHolder, position: Int) {
         holder.bind(photoList!![position])  // отправляем данные текущей позиции
 
+        // выделение всех объектов
+        if(activateCheck == 1){
+            holder.bindingg.checkBox.visibility = View.VISIBLE
+            holder.bindingg.checkBox.setChecked(true)
+            //Log.e("eee", " $position position")
+            dalateById(photoList!![position])  // заполнение списка на удаление
+            holder.bindingg.checkBox.setOnClickListener {
+                if(holder.bindingg.checkBox.isChecked){
+                    Log.e("eee", " $position check")
+                }else{
+                    // !!!
+                    delateBy(photoList!![position])  // удаление из списка удаления
+                }
+            }
+        }else{
+            holder.bindingg.checkBox.visibility = View.GONE
+            holder.bindingg.checkBox.setChecked(false)
+            cleardealeteList()  // снятие галочек
+        }
+
         // видимость объектов
         if(visibleCheck != 0){
             holder.bindingg.checkBox.visibility = View.VISIBLE
+
             holder.bindingg.imageView2.setOnClickListener {
                 val text: String = "$position"
                 val duration = Toast.LENGTH_SHORT
@@ -101,37 +123,28 @@ class RecyclerAdapter() : RecyclerView.Adapter<RecyclerAdapter.PhotoHolder>() {
     // обновление списка
     fun addAll(lst: MutableList<String>?) {
         if(photoList != null) {
-            //Log.e("eee", " not null")
             // добавление элементов
             if (photoList!!.size < lst!!.size) {
-                //Log.e("eee", " lst")
                 var n: Int = lst!!.size - photoList!!.size
-                //Log.e("eee", " $n")
-                //Log.e("eee", (lst!!.size-1).toString())
                 if(n == lst!!.size){
                     n = 0
                 }
                 for (i in n..(lst!!.size - 1)) {
-                    //Log.e("eee", i.toString()+" FOR")
                     addItem(lst.get(i), i)
                 }
-
             }
         }
-
     }
 
     // Удаление элементов списка
     fun deleteALL(lst: MutableList<String>?){
+        Log.e("eee", "deleteALL "+lst?.size.toString())
         // удаление элементов
         if(photoList != null) {
             for(i in 0..(lst!!.size-1)){
-                Log.e("eee", i.toString())
                 deleteItem(photoList!!.indexOf(lst!!.get(i)))
-
             }
         }
-
     }
 
     // для изменения вида списка
@@ -140,26 +153,32 @@ class RecyclerAdapter() : RecyclerView.Adapter<RecyclerAdapter.PhotoHolder>() {
         notifyDataSetChanged()
     }
 
-
-    fun dalateById(t: String){
-        //Log.e("eee", t)
-        delateList.add(t)
-        Log.e("eee", delateList.size.toString()+" deleteSize")
+    // выделение всех элементов в списке
+    fun activatecheck(e: Int){
+        activateCheck = e
+        notifyDataSetChanged()
     }
 
+    // формирование списка на удаление
+    fun dalateById(t: String){
+        delateList.add(t)
+        //Log.e("eee", delateList.size.toString()+" deleteSize")
+    }
+
+    // корректировка списка на удаление
     fun delateBy(d: String){
         for(i in 0..(delateList.size-1)){
             delateList.removeIf {
                 it.contains(d)
             }
         }
-        Log.e("eee", delateList.size.toString()+" deleteSize")
-
     }
 
+    // возврат списка на удаления
     fun getDeleteList(): MutableList<String>? {
         return delateList
     }
+
 
     fun cleardealeteList(){
         delateList.clear()

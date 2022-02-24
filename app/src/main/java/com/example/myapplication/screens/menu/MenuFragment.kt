@@ -112,6 +112,7 @@ class MenuFragment : Fragment() {
         binding.bSpisok.setOnClickListener {
                 fragmentManager
                     ?.beginTransaction()
+                    ?.setCustomAnimations(R.anim.enter_right_to_left,R.anim.exit_right_to_left)
                     ?.replace(R.id.fragment_container,PhotoFragment())
                     ?.commit()
             }
